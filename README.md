@@ -82,7 +82,7 @@ In fine-tuning, `encoder.layers[-2]`, `encoder.layers[-1]`, and `encoder.ln` are
 - 13,000 labeled images at 96×96 pixels across 10 classes
 - Split: 4,500 train / 500 val / 8,000 test
 
-All images are resized to 224×224 and normalized with ImageNet statistics (`mean=[0.485, 0.456, 0.406]`, `std=[0.229, 0.224, 0.225]`). Training data is augmented with random horizontal flips and random crops.
+All images are resized to 224×224 and normalized with ImageNet statistics (`mean=[0.485, 0.456, 0.406]`, `std=[0.229, 0.224, 0.225]`). Training data is augmented with `RandomHorizontalFlip` and `RandomCrop(224, padding=8)`.
 
 ---
 
@@ -105,9 +105,8 @@ The lower learning rate for fine-tuning avoids catastrophic forgetting of pretra
 ## Repository Structure
 
 ```
-├── drnn_cifar10_vit.ipynb    # CIFAR-10 experiment
-├── drnn_stl10_vit.ipynb      # STL10 experiment
-├── DRNN_Report.pdf           # Full report
+├── vit_cifar10_executed.ipynb    # CIFAR-10 experiment (executed)
+├── vit_stl10_executed.ipynb      # STL10 experiment (executed)
 └── README.md
 ```
 
@@ -121,6 +120,7 @@ torchvision
 numpy
 matplotlib
 scikit-learn
+seaborn
 opencv-python
 ```
 
@@ -128,7 +128,15 @@ opencv-python
 
 ## Visualizations
 
-The notebooks include:
-- Training/validation accuracy and loss curves
-- Normalized confusion matrices
-- Grad-CAM attention maps for both Feature Extraction and Fine-tuning models (hooked into `encoder.layers[-1].mlp`)
+Each notebook produces the following outputs:
+
+| File | Description |
+|---|---|
+| `vit_cifar10_comparison_curves.png` | Train/val accuracy & loss curves + summary bar chart (CIFAR-10) |
+| `vit_cifar10_confusion_matrices.png` | Normalized 10×10 confusion matrices — FE and FT (CIFAR-10) |
+| `vit_cifar10_gradcam.png` | Grad-CAM heatmaps for 6 test images — original / FE / FT rows (CIFAR-10) |
+| `vit_stl10_comparison_curves.png` | Train/val accuracy & loss curves + summary bar chart (STL10) |
+| `vit_stl10_confusion_matrices.png` | Normalized 10×10 confusion matrices — FE and FT (STL10) |
+| `vit_stl10_gradcam.png` | Grad-CAM heatmaps for 6 test images — original / FE / FT rows (STL10) |
+
+Grad-CAM is hooked into `encoder.layers[-1].mlp` (last transformer block's MLP). The 196 patch tokens are reshaped to a 14×14 spatial grid and overlaid with the JET colormap. Per-class precision, recall, and F1 are also printed via `sklearn.metrics.classification_report`.
